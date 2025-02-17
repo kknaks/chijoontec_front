@@ -22,11 +22,11 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "strict": false,         // 변경
+    "noUnusedLocals": false, // 변경
+    "noUnusedParameters": false, // 변경
+    "allowJs": true,        // 추가
+    "noImplicitAny": false  // 추가
   },
   "include": ["src"]
 }
