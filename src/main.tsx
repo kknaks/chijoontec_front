@@ -8,3 +8,8 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
+
+const rootElement = document.getElementById('root');
+rootElement.style.position = 'absolute';
+rootElement.style.top = '0';
+rootElement.style.width = '100%';

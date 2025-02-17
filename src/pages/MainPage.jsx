@@ -13,15 +13,15 @@ const MainPage = () => {
   useEffect(() => {
     // 목데이터 설정
     const mockData = [
-      { id: 1, tec: 'React', tecDescription: 'A JavaScript library for building user interfaces', tecFrom: 'Facebook' },
-      { id: 2, tec: 'Vue', tecDescription: 'The Progressive JavaScript Framework', tecFrom: 'Evan You' },
-      { id: 3, tec: 'Angular', tecDescription: 'One framework. Mobile & desktop.', tecFrom: 'Google' },
+      { id: 1, category: 'Database', subCategory: 'SQL', detailCategory: 'RDMS', tec: 'MySQL', tecDescription: 'RDBMS(MySQL), NoSQL DB를 활용한 효율적인 저장구조 설계 및 개발 경험이 있으신 분', source: '당근' },
+      { id: 2, category: 'JAVA', subCategory: 'Spring', detailCategory: 'SpringBoot', tec: 'WebSocket', tecDescription: '서버-클라이언트 실시간 통신 서비스 구현', source: '당근' },
+      { id: 3, category: 'CI/CD', subCategory: 'CI', detailCategory: 'Deploy', tec: 'Docker', tecDescription: 'Docker 컨테이너를 활용한 배포 서비스 구현', source: '당근' },
     ];
     setTecList(mockData);
   }, []);
 
   return (
-    <div className="p-8">
+    <div className="pt-0">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Tec List</h1>
         <div className="w-8 h-8 bg-gray-200 rounded-full" />
@@ -36,11 +36,16 @@ const MainPage = () => {
             <SelectValue placeholder="From" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="facebook">Facebook</SelectItem>
-            <SelectItem value="evan-you">Evan You</SelectItem>
-            <SelectItem value="google">Google</SelectItem>
+            <SelectItem value="database">Database</SelectItem>
+            <SelectItem value="java">JAVA</SelectItem>
+            <SelectItem value="ci-cd">CI/CD</SelectItem>
           </SelectContent>
         </Select>
+        <Button className="ml-auto border border-primary hover:bg-primary/90 hover:shadow-md hover:text-white transition-all" 
+            variant="primary"
+            >
+            Add Tec
+            </Button>
       </div>
 
       <div className="border rounded-lg">
@@ -50,11 +55,12 @@ const MainPage = () => {
               <TableHead className="w-12">
                 <Checkbox />
               </TableHead>
-              <TableHead className="w-48">ID</TableHead>
-              <TableHead className="w-96">Technology</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>From</TableHead>
-              <TableHead className="w-12"></TableHead>
+              <TableHead className="w-20 text-center">Category</TableHead>
+              <TableHead className="w-20 text-center">Sub Category</TableHead>
+              <TableHead className="w-20 text-center">Detail Category</TableHead>
+              <TableHead className="w-20 text-center">Technology</TableHead>
+              <TableHead className="text-center">Description</TableHead>
+              <TableHead className="w-20 text-center">Source</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,21 +69,12 @@ const MainPage = () => {
                 <TableCell>
                   <Checkbox />
                 </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{tec.id}</span>
-                    <Badge variant="outline">{tec.tec}</Badge>
-                  </div>
-                </TableCell>
+                <TableCell className="w-32">{tec.category}</TableCell>
+                <TableCell className="w-32">{tec.subCategory}</TableCell>
+                <TableCell className="w-32">{tec.detailCategory}</TableCell>
+                <TableCell className="w-32">{tec.tec}</TableCell>
                 <TableCell>{tec.tecDescription}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{tec.tecFrom}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="icon">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </TableCell>
+                <TableCell>{tec.source}</TableCell>
               </TableRow>
             ))}
           </TableBody>
