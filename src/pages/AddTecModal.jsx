@@ -11,6 +11,11 @@ const AddTecModal = ({ isOpen, onClose }) => {
   const [subCategories, setSubCategories] = useState([]);
   const [detailCategories, setDetailCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState('');
+  const [technology, setTechnology] = useState('');
+  const [jobPosting, setJobPosting] = useState('');
+  const [sourceURL, setSourceURL] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -36,6 +41,24 @@ const AddTecModal = ({ isOpen, onClose }) => {
     }
   }, [selectedCategoryId]);
 
+  const handleAdd = () => {
+    const data = {
+      categoryId: selectedCategoryId,
+      subCategoryId: selectedSubCategoryId,
+      technology,
+      jobPosting,
+      sourceURL,
+      description,
+    };
+
+    axios.post('http://localhost:8090', data)
+      .then(response => {
+        console.log('Technology added:', response.data);
+        onClose();
+      })
+      .catch(error => console.error('Error adding technology:', error));
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
@@ -55,7 +78,7 @@ const AddTecModal = ({ isOpen, onClose }) => {
                 ))}
               </SelectContent>
             </Select>
-            <Select>
+            <Select onValueChange={(value) => setSelectedSubCategoryId(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Sub Category" />
               </SelectTrigger>
@@ -65,16 +88,17 @@ const AddTecModal = ({ isOpen, onClose }) => {
                 ))}
               </SelectContent>
             </Select>
-            <Input placeholder="Technology" />
+            <Input placeholder="Technology" value={technology} onChange={(e) => setTechnology(e.target.value)} />
           </div>
           <div className="w-full">
-            <DescriptionTextarea />
+            <DescriptionTextarea value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
-          <Input placeholder="Source" />
+          <Input placeholder="Job Posting" value={jobPosting} onChange={(e) => setJobPosting(e.target.value)} />
+          <Input placeholder="SourceURL" value={sourceURL} onChange={(e) => setSourceURL(e.target.value)} />
         </div>
         <DialogFooter>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button variant="primary">Add</Button>
+          <Button variant="primary" onClick={handleAdd}>Add</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

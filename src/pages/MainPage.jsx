@@ -5,21 +5,25 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, FileText } from "lucide-react"; // 문서 모양 아이콘 추가
 import AddTecModal from './AddTecModal';
+import axios from 'axios';
 
 const MainPage = () => {
   const [tecList, setTecList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const fetchTecList = () => {
+    axios.get('http://localhost:8090')
+      .then(response => {
+        console.log(response.data);
+        setTecList(response.data);
+      })
+      .catch(error => console.error('Error fetching technology list:', error));
+  };
+
   useEffect(() => {
-    // 목데이터 설정
-    const mockData = [
-      { id: 1, category: 'Database', subCategory: 'SQL', detailCategory: 'RDMS', tec: 'MySQL', tecDescription: 'RDBMS(MySQL), NoSQL DB를 활용한 효율적인 저장구조 설계 및 개발 경험이 있으신 분', source: '당근' },
-      { id: 2, category: 'JAVA', subCategory: 'Spring', detailCategory: 'SpringBoot', tec: 'WebSocket', tecDescription: '서버-클라이언트 실시간 통신 서비스 구현', source: '당근' },
-      { id: 3, category: 'CI/CD', subCategory: 'CI', detailCategory: 'Deploy', tec: 'Docker', tecDescription: 'Docker 컨테이너를 활용한 배포 서비스 구현', source: '당근' },
-    ];
-    setTecList(mockData);
+    fetchTecList();
   }, []);
 
   const handleAddTecClick = () => {
@@ -28,6 +32,7 @@ const MainPage = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    fetchTecList(); // 리스트를 다시 가져옴
   };
 
   return (
@@ -68,10 +73,11 @@ const MainPage = () => {
               </TableHead>
               <TableHead className="w-20 text-center">Category</TableHead>
               <TableHead className="w-20 text-center">Sub Category</TableHead>
-              <TableHead className="w-20 text-center">Detail Category</TableHead>
+              {/* <TableHead className="w-20 text-center">Detail Category</TableHead> */}
               <TableHead className="w-20 text-center">Technology</TableHead>
               <TableHead className="text-center">Description</TableHead>
-              <TableHead className="w-20 text-center">Source</TableHead>
+              <TableHead className="text-center">Source</TableHead>
+              <TableHead className="text-center">URL</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -80,12 +86,17 @@ const MainPage = () => {
                 <TableCell>
                   <Checkbox />
                 </TableCell>
-                <TableCell className="w-32">{tec.category}</TableCell>
-                <TableCell className="w-32">{tec.subCategory}</TableCell>
-                <TableCell className="w-32">{tec.detailCategory}</TableCell>
-                <TableCell className="w-32">{tec.tec}</TableCell>
-                <TableCell>{tec.tecDescription}</TableCell>
-                <TableCell>{tec.source}</TableCell>
+                <TableCell className="w-32">{tec.primaryCategory}</TableCell>
+                <TableCell className="w-32">{tec.secondaryCategory}</TableCell>
+                {/* <TableCell className="w-32">{tec.detailCategory}</TableCell> */}
+                <TableCell className="w-32">{tec.technology}</TableCell>
+                <TableCell className="text-left px-20">{tec.description}</TableCell>
+                <TableCell>{tec.jobPosting}</TableCell>
+                <TableCell className="text-center">                    
+                <a href={tec.sourceURL} target="_blank" rel="noopener noreferrer" className="inline-flex justify-center">
+                    <FileText className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+                </a>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
