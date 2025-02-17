@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MoreHorizontal } from "lucide-react";
+import AddTecModal from './AddTecModal';
 
 const MainPage = () => {
   const [tecList, setTecList] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // 목데이터 설정
@@ -19,6 +21,14 @@ const MainPage = () => {
     ];
     setTecList(mockData);
   }, []);
+
+  const handleAddTecClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="pt-0">
@@ -43,6 +53,7 @@ const MainPage = () => {
         </Select>
         <Button className="ml-auto border border-primary hover:bg-primary/90 hover:shadow-md hover:text-white transition-all" 
             variant="primary"
+            onClick={handleAddTecClick}
             >
             Add Tec
             </Button>
@@ -98,6 +109,8 @@ const MainPage = () => {
           <span className="text-sm text-gray-500">Page 1 of 1</span>
         </div>
       </div>
+
+      <AddTecModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };
