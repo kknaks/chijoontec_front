@@ -16,7 +16,7 @@ const MainPage = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchTecList = (page, size) => {
-    axios.get(`http://localhost:8090?page=${page}&size=${size}`)
+    axios.get(`${import.meta.env.VITE_CORE_API_BASE_URL}?page=${page}&size=${size}`)
       .then(response => {
         console.log(response.data);
         setTecList(response.data.content);

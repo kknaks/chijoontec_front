@@ -19,7 +19,7 @@ const AddTecModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      axios.get('http://localhost:8090/category/primary')
+      axios.get(`${import.meta.env.VITE_CORE_API_BASE_URL}/category/primary`)
         .then(response => {
           console.log(response);
           const data = Array.isArray(response.data) ? response.data : [];
@@ -31,7 +31,7 @@ const AddTecModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (selectedCategoryId) {
-      axios.get(`http://localhost:8090/category/secondary/${selectedCategoryId}`)
+      axios.get(`${import.meta.env.VITE_CORE_API_BASE_URL}/category/secondary/${selectedCategoryId}`)
         .then(response => {
           console.log(response);
           const data = Array.isArray(response.data) ? response.data : [];
@@ -51,7 +51,7 @@ const AddTecModal = ({ isOpen, onClose }) => {
       description,
     };
 
-    axios.post('http://localhost:8090', data)
+    axios.post(`${import.meta.env.VITE_CORE_API_BASE_URL}`, data)
       .then(response => {
         console.log('Technology added:', response.data);
         onClose();
