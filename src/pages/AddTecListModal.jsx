@@ -4,10 +4,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import AddSubCategoryModal from './AddSubCategoryModal';
 
 const AddTecListModal = ({ isOpen, onClose }) => {
   const [categories, setCategories] = useState([]);
   const [tecList, setTecList] = useState([{ technology: '', jobPosting: '', sourceURL: '', description: '', categoryId: '', subCategoryId: '', subCategories: [] }]);
+  const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [selectedCategoryName, setSelectedCategoryName] = useState('');
+  const [activeRowIndex, setActiveRowIndex] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,8 +69,36 @@ const AddTecListModal = ({ isOpen, onClose }) => {
       .catch(error => console.error('Error adding technologies:', error));
   };
 
+  // 모달 관련 핸들러 추가
+  const handleOpenSubCategoryModal = (index) => {
+    const tec = tecList[index];
+    const selectedCategory = categories.find(category => category.id === tec.categoryId);
+    setSelectedCategoryId(tec.categoryId);
+    setSelectedCategoryName(selectedCategory ? selectedCategory.name : '');
+    setActiveRowIndex(index);
+    setIsSubCategoryModalOpen(true);
+  };
+
+  const handleCloseSubCategoryModal = () => {
+    setIsSubCategoryModalOpen(false);
+    // 서브 카테고리 추가 후 해당 행의 서브카테고리 목록 다시 불러오기
+    if (selectedCategoryId && activeRowIndex !== null) {
+      axios.get(`${import.meta.env.VITE_CORE_API_BASE_URL}/category/secondary/${selectedCategoryId}`)
+        .then(response => {
+          const data = Array.isArray(response.data) ? response.data : [];
+          handleSubCategoriesChange(activeRowIndex, data);
+        })
+        .catch(error => console.error('Error fetching secondary categories:', error));
+    }
+  };
+
+  const handleClose = () => {
+    setTecList([{ technology: '', jobPosting: '', sourceURL: '', description: '', categoryId: '', subCategoryId: '', subCategories: [] }]);
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => open ? null : handleClose()}>
       <DialogContent className="max-w-7xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Add New Technologies</DialogTitle>
@@ -90,8 +123,24 @@ const AddTecListModal = ({ isOpen, onClose }) => {
                 </SelectTrigger>
                 <SelectContent>
                   {tec.subCategories.map((subCategory) => (
-                    <SelectItem key={subCategory.id} value={subCategory.id}>{subCategory.name}</SelectItem>
+                    <SelectItem key={subCategory.id} value={subCategory.id}>
+                      {subCategory.name}
+                    </SelectItem>
                   ))}
+                  {tec.categoryId && (
+                    <div className="py-2">
+                      <Button 
+                        variant="link" 
+                        className="text-gray-500 text-sm font-normal flex items-center gap-1 p-1 h-auto"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleOpenSubCategoryModal(index);
+                        }}
+                      >
+                        + 추가하기
+                      </Button>
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
               <Input className="w-32" placeholder="Technology" value={tec.technology} onChange={(e) => handleChange(index, 'technology', e.target.value)} />
@@ -104,10 +153,16 @@ const AddTecListModal = ({ isOpen, onClose }) => {
           <Button variant="secondary" onClick={handleAddTec}>Add Another Technology</Button>
         </div>
         <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="secondary" onClick={handleClose}>Cancel</Button>
           <Button variant="primary" onClick={handleAdd}>Add</Button>
         </DialogFooter>
       </DialogContent>
+      <AddSubCategoryModal 
+        isOpen={isSubCategoryModalOpen}
+        onClose={handleCloseSubCategoryModal}
+        categoryId={selectedCategoryId}
+        categoryName={selectedCategoryName}
+      />
     </Dialog>
   );
 };

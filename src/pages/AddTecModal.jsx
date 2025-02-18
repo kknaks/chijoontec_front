@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import DescriptionTextarea from './DescriptionTextarea';
+import AddSubCategoryModal from './AddSubCategoryModal';
 
 const AddTecModal = ({ isOpen, onClose }) => {
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
-  const [detailCategories, setDetailCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState('');
   const [technology, setTechnology] = useState('');
   const [jobPosting, setJobPosting] = useState('');
   const [sourceURL, setSourceURL] = useState('');
   const [description, setDescription] = useState('');
+  const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,6 +61,24 @@ const AddTecModal = ({ isOpen, onClose }) => {
       .catch(error => console.error('Error adding technology:', error));
   };
 
+  const handleOpenSubCategoryModal = () => {
+    setIsSubCategoryModalOpen(true);
+  };
+
+  const handleCloseSubCategoryModal = () => {
+    setIsSubCategoryModalOpen(false);
+    // 서브 카테고리 추가 후 다시 불러오기
+    if (selectedCategoryId) {
+      axios.get(`${import.meta.env.VITE_CORE_API_BASE_URL}/category/secondary/${selectedCategoryId}`)
+        .then(response => {
+          console.log(response);
+          const data = Array.isArray(response.data) ? response.data : [];
+          setSubCategories(data);
+        })
+        .catch(error => console.error('Error fetching secondary categories:', error));
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
@@ -68,7 +88,11 @@ const AddTecModal = ({ isOpen, onClose }) => {
         </DialogHeader>
         <div className="space-y-4">
           <div className="flex space-x-4">
-            <Select onValueChange={(value) => setSelectedCategoryId(value)}>
+            <Select onValueChange={(value) => {
+              setSelectedCategoryId(value);
+              const selectedCategory = categories.find(category => category.id === value);
+              setSelectedCategoryName(selectedCategory ? selectedCategory.name : '');
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -86,6 +110,14 @@ const AddTecModal = ({ isOpen, onClose }) => {
                 {subCategories.map((subCategory) => (
                   <SelectItem key={subCategory.id} value={subCategory.id}>{subCategory.name}</SelectItem>
                 ))}
+                {selectedCategoryId && (
+                  <div className="py-2">
+                    <Button 
+                    variant="link" 
+                    className="text-gray-500 text-sm font-normal flex items-center gap-1 p-1 h-auto"
+                    onClick={handleOpenSubCategoryModal}>+ 추가하기</Button>
+                  </div>
+                )}
               </SelectContent>
             </Select>
             <Input placeholder="Technology" value={technology} onChange={(e) => setTechnology(e.target.value)} />
@@ -101,6 +133,12 @@ const AddTecModal = ({ isOpen, onClose }) => {
           <Button variant="primary" onClick={handleAdd}>Add</Button>
         </DialogFooter>
       </DialogContent>
+      <AddSubCategoryModal 
+        isOpen={isSubCategoryModalOpen} 
+        onClose={handleCloseSubCategoryModal} 
+        categoryId={selectedCategoryId} 
+        categoryName={selectedCategoryName} 
+      />
     </Dialog>
   );
 };
