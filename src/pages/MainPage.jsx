@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import AddTecModal from './AddTecModal';
 import AddTecListModal from './AddTecListModal';
 import MainTable from './MainTable';
+import MainCart from './MainCart';
 import axios from 'axios';
 
 const MainPage = () => {
@@ -14,6 +15,7 @@ const MainPage = () => {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [cartItems, setCartItems] = useState([]);
 
   const fetchTecList = (page, size) => {
     axios.get(`${import.meta.env.VITE_CORE_API_BASE_URL}?page=${page}&size=${size}`)
@@ -54,6 +56,14 @@ const MainPage = () => {
   const handleSizeChange = (newSize) => {
     setSize(newSize);
     setPage(0); // 페이지 크기 변경 시 첫 페이지로 이동
+  };
+
+  const handleCartChange = (newCartItems) => {
+    setCartItems(newCartItems);
+  };
+
+  const handleRemoveFromCart = (itemId) => {
+    setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
   };
 
   return (
@@ -97,7 +107,11 @@ const MainPage = () => {
             </div>
         </div>
 
-      <MainTable tecList={tecList} />
+      <MainTable 
+        tecList={tecList} 
+        onCartChange={handleCartChange}
+        cartItems={cartItems}  // cartItems 추가
+      />
 
       <div className="flex justify-between items-center mt-4">
         <div className="text-sm text-gray-500">0 of {tecList.length} row(s) selected.</div>
@@ -118,6 +132,11 @@ const MainPage = () => {
           <Button onClick={() => handlePageChange(page + 1)} disabled={page + 1 >= totalPages}>Next</Button>
         </div>
       </div>
+
+      <MainCart 
+        cartItems={cartItems} 
+        onRemoveItem={handleRemoveFromCart} 
+      />
 
       <AddTecModal isOpen={isModalOpen} onClose={handleCloseModal} />
       <AddTecListModal isOpen={isListModalOpen} onClose={handleCloseListModal} />
