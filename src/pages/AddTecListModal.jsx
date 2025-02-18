@@ -13,6 +13,7 @@ const AddTecListModal = ({ isOpen, onClose }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [activeRowIndex, setActiveRowIndex] = useState(null);
+  const [errors, setErrors] = useState([]);
 
   useEffect(() => {
     if (isOpen) {
@@ -60,11 +61,27 @@ const AddTecListModal = ({ isOpen, onClose }) => {
   };
 
   const handleAdd = () => {
+    const newErrors = tecList.map(tec => {
+      const tecErrors = {};
+      if (!tec.categoryId) tecErrors.categoryId = true;
+      if (!tec.subCategoryId) tecErrors.subCategoryId = true;
+      if (!tec.technology) tecErrors.technology = true;
+      if (!tec.jobPosting) tecErrors.jobPosting = true;
+      if (!tec.sourceURL) tecErrors.sourceURL = true;
+      if (!tec.description) tecErrors.description = true;
+      return tecErrors;
+    });
+
+    if (newErrors.some(tecErrors => Object.keys(tecErrors).length > 0)) {
+      setErrors(newErrors);
+      return;
+    }
+
     console.log('Adding technologies:', tecList);
     axios.post(`${import.meta.env.VITE_CORE_API_BASE_URL}/bulk`, tecList)
       .then(response => {
         console.log('Technologies added:', response.data);
-        onClose();
+        handleClose();
       })
       .catch(error => console.error('Error adding technologies:', error));
   };
@@ -94,6 +111,7 @@ const AddTecListModal = ({ isOpen, onClose }) => {
 
   const handleClose = () => {
     setTecList([{ technology: '', jobPosting: '', sourceURL: '', description: '', categoryId: '', subCategoryId: '', subCategories: [] }]);
+    setErrors([]);
     onClose();
   };
 
@@ -107,8 +125,13 @@ const AddTecListModal = ({ isOpen, onClose }) => {
         <div className="space-y-4 overflow-y-auto max-h-[calc(90vh-200px)]">
           {tecList.map((tec, index) => (
             <div key={index} className="flex space-x-4 items-center border-b pb-4">
-              <Select onValueChange={(value) => handleChange(index, 'categoryId', value)}>
-                <SelectTrigger className="w-80">
+              <Select onValueChange={(value) => {
+                handleChange(index, 'categoryId', value);
+                const newErrors = [...errors];
+                newErrors[index] = { ...newErrors[index], categoryId: false };
+                setErrors(newErrors);
+              }}>
+                <SelectTrigger className={`w-80 ${errors[index]?.categoryId ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -117,8 +140,13 @@ const AddTecListModal = ({ isOpen, onClose }) => {
                   ))}
                 </SelectContent>
               </Select>
-              <Select onValueChange={(value) => handleChange(index, 'subCategoryId', value)}>
-                <SelectTrigger className="w-80">
+              <Select onValueChange={(value) => {
+                handleChange(index, 'subCategoryId', value);
+                const newErrors = [...errors];
+                newErrors[index] = { ...newErrors[index], subCategoryId: false };
+                setErrors(newErrors);
+              }}>
+                <SelectTrigger className={`w-80 ${errors[index]?.subCategoryId ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="SubCategory" />
                 </SelectTrigger>
                 <SelectContent>
@@ -143,10 +171,50 @@ const AddTecListModal = ({ isOpen, onClose }) => {
                   )}
                 </SelectContent>
               </Select>
-              <Input className="w-32" placeholder="Technology" value={tec.technology} onChange={(e) => handleChange(index, 'technology', e.target.value)} />
-              <Input placeholder="Description" value={tec.description} onChange={(e) => handleChange(index, 'description', e.target.value)} />
-              <Input className="w-32" placeholder="Job Posting" value={tec.jobPosting} onChange={(e) => handleChange(index, 'jobPosting', e.target.value)} />
-              <Input className="w-32" placeholder="SourceURL" value={tec.sourceURL} onChange={(e) => handleChange(index, 'sourceURL', e.target.value)} />
+              <Input 
+                className={`w-32 ${errors[index]?.technology ? 'border-red-500' : ''}`} 
+                placeholder="Technology" 
+                value={tec.technology} 
+                onChange={(e) => {
+                  handleChange(index, 'technology', e.target.value);
+                  const newErrors = [...errors];
+                  newErrors[index] = { ...newErrors[index], technology: false };
+                  setErrors(newErrors);
+                }} 
+              />
+              <Input 
+                placeholder="Description" 
+                value={tec.description} 
+                onChange={(e) => {
+                  handleChange(index, 'description', e.target.value);
+                  const newErrors = [...errors];
+                  newErrors[index] = { ...newErrors[index], description: false };
+                  setErrors(newErrors);
+                }} 
+                className={errors[index]?.description ? 'border-red-500' : ''}
+              />
+              <Input 
+                className={`w-32 ${errors[index]?.jobPosting ? 'border-red-500' : ''}`} 
+                placeholder="Job Posting" 
+                value={tec.jobPosting} 
+                onChange={(e) => {
+                  handleChange(index, 'jobPosting', e.target.value);
+                  const newErrors = [...errors];
+                  newErrors[index] = { ...newErrors[index], jobPosting: false };
+                  setErrors(newErrors);
+                }} 
+              />
+              <Input 
+                className={`w-32 ${errors[index]?.sourceURL ? 'border-red-500' : ''}`} 
+                placeholder="SourceURL" 
+                value={tec.sourceURL} 
+                onChange={(e) => {
+                  handleChange(index, 'sourceURL', e.target.value);
+                  const newErrors = [...errors];
+                  newErrors[index] = { ...newErrors[index], sourceURL: false };
+                  setErrors(newErrors);
+                }} 
+              />
               <Button variant="secondary" onClick={() => handleRemoveTec(index)}>Remove</Button>
             </div>
           ))}

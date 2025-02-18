@@ -18,6 +18,7 @@ const AddTecModal = ({ isOpen, onClose }) => {
   const [sourceURL, setSourceURL] = useState('');
   const [description, setDescription] = useState('');
   const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (isOpen) {
@@ -44,6 +45,19 @@ const AddTecModal = ({ isOpen, onClose }) => {
   }, [selectedCategoryId]);
 
   const handleAdd = () => {
+    const newErrors = {};
+    if (!selectedCategoryId) newErrors.selectedCategoryId = true;
+    if (!selectedSubCategoryId) newErrors.selectedSubCategoryId = true;
+    if (!technology) newErrors.technology = true;
+    if (!jobPosting) newErrors.jobPosting = true;
+    if (!sourceURL) newErrors.sourceURL = true;
+    if (!description) newErrors.description = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     const data = {
       categoryId: selectedCategoryId,
       subCategoryId: selectedSubCategoryId,
@@ -56,7 +70,7 @@ const AddTecModal = ({ isOpen, onClose }) => {
     axios.post(`${import.meta.env.VITE_CORE_API_BASE_URL}`, data)
       .then(response => {
         console.log('Technology added:', response.data);
-        onClose();
+        handleClose();
       })
       .catch(error => console.error('Error adding technology:', error));
   };
@@ -79,8 +93,20 @@ const AddTecModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleClose = () => {
+    setSelectedCategoryId('');
+    setSelectedCategoryName('');
+    setSelectedSubCategoryId('');
+    setTechnology('');
+    setJobPosting('');
+    setSourceURL('');
+    setDescription('');
+    setErrors({});
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => open ? null : handleClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Technology</DialogTitle>
@@ -92,8 +118,9 @@ const AddTecModal = ({ isOpen, onClose }) => {
               setSelectedCategoryId(value);
               const selectedCategory = categories.find(category => category.id === value);
               setSelectedCategoryName(selectedCategory ? selectedCategory.name : '');
+              setErrors({ ...errors, selectedCategoryId: false });
             }}>
-              <SelectTrigger>
+              <SelectTrigger className={errors.selectedCategoryId ? 'border-red-500' : ''}>
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -102,8 +129,11 @@ const AddTecModal = ({ isOpen, onClose }) => {
                 ))}
               </SelectContent>
             </Select>
-            <Select onValueChange={(value) => setSelectedSubCategoryId(value)}>
-              <SelectTrigger>
+            <Select onValueChange={(value) => {
+              setSelectedSubCategoryId(value);
+              setErrors({ ...errors, selectedSubCategoryId: false });
+            }}>
+              <SelectTrigger className={errors.selectedSubCategoryId ? 'border-red-500' : ''}>
                 <SelectValue placeholder="Sub Category" />
               </SelectTrigger>
               <SelectContent>
@@ -120,16 +150,47 @@ const AddTecModal = ({ isOpen, onClose }) => {
                 )}
               </SelectContent>
             </Select>
-            <Input placeholder="Technology" value={technology} onChange={(e) => setTechnology(e.target.value)} />
+            <Input 
+              placeholder="Technology" 
+              value={technology} 
+              onChange={(e) => {
+                setTechnology(e.target.value);
+                setErrors({ ...errors, technology: false });
+              }} 
+              className={errors.technology ? 'border-red-500' : ''}
+            />
           </div>
           <div className="w-full">
-            <DescriptionTextarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            <DescriptionTextarea 
+              value={description} 
+              onChange={(e) => {
+                setDescription(e.target.value);
+                setErrors({ ...errors, description: false });
+              }} 
+              className={errors.description ? 'border-red-500' : ''}
+            />
           </div>
-          <Input placeholder="Job Posting" value={jobPosting} onChange={(e) => setJobPosting(e.target.value)} />
-          <Input placeholder="SourceURL" value={sourceURL} onChange={(e) => setSourceURL(e.target.value)} />
+          <Input 
+            placeholder="Job Posting" 
+            value={jobPosting} 
+            onChange={(e) => {
+              setJobPosting(e.target.value);
+              setErrors({ ...errors, jobPosting: false });
+            }} 
+            className={errors.jobPosting ? 'border-red-500' : ''}
+          />
+          <Input 
+            placeholder="SourceURL" 
+            value={sourceURL} 
+            onChange={(e) => {
+              setSourceURL(e.target.value);
+              setErrors({ ...errors, sourceURL: false });
+            }} 
+            className={errors.sourceURL ? 'border-red-500' : ''}
+          />
         </div>
         <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="secondary" onClick={handleClose}>Cancel</Button>
           <Button variant="primary" onClick={handleAdd}>Add</Button>
         </DialogFooter>
       </DialogContent>
