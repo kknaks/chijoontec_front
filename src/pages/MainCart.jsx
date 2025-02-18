@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Trash2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import { ShoppingCart } from "lucide-react"; // 장바구니 모양 아이콘 추가
+import PrintModal from './PrintModal';
 
 const MainCart = ({ cartItems, onRemoveItem }) => {
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
   return (
     <div className="mt-4 p-4 border rounded-lg">
       <div className="flex justify-between items-center mb-4">
-  <div className="flex items-center gap-2 px-3">
-    <ShoppingCart className="" size={20} />
-    <h2 className="text-xl font-bold flex items-center gap-2">Cart({cartItems.length})</h2>
-  </div>
-  <Button variant="outline">Print</Button>
-</div>
+        <div className="flex items-center gap-2 px-3">
+          <ShoppingCart className="" size={20} />
+          <h2 className="text-xl font-bold flex items-center gap-2">Cart({cartItems.length})</h2>
+        </div>
+        <Button variant="outline" onClick={() => setIsPrintModalOpen(true)}>Print</Button>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -54,6 +57,11 @@ const MainCart = ({ cartItems, onRemoveItem }) => {
           ))}
         </TableBody>
       </Table>
+      <PrintModal 
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        cartItems={cartItems}
+      />
     </div>
   );
 };
