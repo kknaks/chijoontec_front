@@ -102,7 +102,7 @@ const PrintModal = ({ isOpen, onClose, cartItems }) => {
         </DialogHeader>
         <div className="bg-gray-50 p-6 rounded-lg">
           {isLoading ? (
-            <div className="text-center py-4">Loading...</div>
+            <div className="text-center py-4">GPT답변 생성 중...</div>
           ) : error ? (
             <div className="text-red-500 py-4">{error}</div>
           ) : response ? (

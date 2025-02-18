@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddTecModal from './AddTecModal';
 import AddTecListModal from './AddTecListModal';
 import MainTable from './MainTable';
 import MainCart from './MainCart';
 import axios from 'axios';
+import { AlertCircle } from 'lucide-react'
 
 const MainPage = () => {
   const [tecList, setTecList] = useState([]);
@@ -70,8 +72,20 @@ const MainPage = () => {
     <div className="pt-0">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">채용공고 기술스택 모아보기</h1>
+    
         <div className="w-8 h-8 bg-gray-200 rounded-full" />
+        
       </div>
+      <Alert className="my-4">
+        {/* <AlertCircle className="h-4 w-4" /> */}
+        <AlertTitle className="text-left">Notification</AlertTitle>
+        <AlertDescription className="text-sm text-gray-500 text-left">
+          이력서 작성 중에 프로젝트 기술경험, 기술스택 설명을 적기 어려워서 만든 사이트<br />   
+          채용 공고에서 요구하는 기술스택을 모아서 이력서 작성 시 참고하면 좋을 것 같아서 만들었습니다.<br />
+          다 같이 만들어 봅시다. Add Tec 누르면 공고에 기술된 내용을 추가할 수 있어요.
+        </AlertDescription>
+      </Alert>
+      {/* <h4 className="text-left"> 이력서 작성 중에 프로젝트 기술경험, 기술스택 설명을 적기 어려워서 만든 사이트</h4> */}
       <div className="flex justify-between mb-6">
             {/* 왼쪽 그룹 */}
             <div className="flex gap-4">
